@@ -42,6 +42,7 @@ public class CatScriptTokenizer {
 
         if(matchAndConsume('"')){
             int start = postion;
+
             while (!tokenizationEnd() && peek() != '"') {
                 if (peek() == '\\') {
                     takeChar();
@@ -53,10 +54,10 @@ public class CatScriptTokenizer {
                     takeChar();
                 }
             }
-
+            String value = src.substring(start, postion);
             if (matchAndConsume('"')) {
 
-                tokenList.addToken(STRING, "string", start, postion, line, lineOffset);
+                tokenList.addToken(STRING, value, start, postion, line, lineOffset);
                 return true;
             } else {
                 tokenList.addToken(ERROR, "<Unexpected Token:", start, postion, line, lineOffset);
@@ -76,7 +77,10 @@ public class CatScriptTokenizer {
                 takeChar();
             }
             String value = src.substring(start, postion);
-            lineOffset++;
+            for(int i=0; i< value.length(); i++){
+                lineOffset++;
+            }
+
             if (KEYWORDS.containsKey(value)) {
                 tokenList.addToken(KEYWORDS.get(value), value, start, postion, line, lineOffset);
             } else {
