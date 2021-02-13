@@ -29,6 +29,7 @@ public class CatScriptTokenizerTest extends CatscriptTestBase {
     }
 
     @Test
+
     public void basicString(){
         assertTokensAre("\"asdf\"", STRING, EOF);
         assertTokensAre( "\"asdf\"", "asdf", "<EOF>");
@@ -38,6 +39,7 @@ public class CatScriptTokenizerTest extends CatscriptTestBase {
     }
 
     @Test
+
     public void unterminatedStrings(){
         assertTokensAre("\"asdf", ERROR, EOF);
         assertTokensAre("\"asdf\"\"asdf", STRING, ERROR, EOF);
@@ -71,6 +73,7 @@ public class CatScriptTokenizerTest extends CatscriptTestBase {
     }
 
     @Test
+
     public void basicSyntax(){
         assertTokensAre("( ) { } [ ] : , . - + / * != = == > >= < <=",
                 LEFT_PAREN, RIGHT_PAREN,
@@ -97,11 +100,13 @@ public class CatScriptTokenizerTest extends CatscriptTestBase {
     }
 
     @Test
+
     public void listLiteralTokenization() {
         assertTokensAre("[1, 2, 3]", LEFT_BRACKET, INTEGER, COMMA, INTEGER, COMMA, INTEGER, RIGHT_BRACKET, EOF);
     }
 
     @Test
+    //uncomment me
     public void linesAreCorrect() {
         final List<Token> tokenList = getTokensAsList("a\n b\n  c");
         assertEquals(1, tokenList.get(0).getLine());
@@ -110,6 +115,7 @@ public class CatScriptTokenizerTest extends CatscriptTestBase {
     }
 
     @Test
+
     public void lineOffsetsAreCorrect() {
         final List<Token> tokenList = getTokensAsList("a\n b\n  c d\nfoo");
         assertEquals(0, tokenList.get(0).getLineOffset());
