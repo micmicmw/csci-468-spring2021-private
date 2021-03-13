@@ -96,7 +96,7 @@ public class CatScriptParser {
             return unaryExpression;
         }
             return parsePrimaryExpression();
-        
+
     }
 
     private  Expression parseFactorExpression(){
