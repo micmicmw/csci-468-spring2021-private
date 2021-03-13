@@ -87,30 +87,30 @@ public class CatScriptParser {
 
     private Expression parseUnary_expression(){
 
-        if(tokens.match(NOT,MINUS)){
+        while(tokens.match(NOT,MINUS)) {
             Token operator = tokens.consumeToken();
             final Expression righthand = parseUnary_expression();
-            UnaryExpression unaryExpression = new UnaryExpression(operator,righthand);
+            UnaryExpression unaryExpression = new UnaryExpression(operator, righthand);
             unaryExpression.setStart(operator);
             unaryExpression.setEnd(righthand.getEnd());
             return unaryExpression;
-        }else{
-            return parsePrimaryExpression();
         }
+            return parsePrimaryExpression();
+        
     }
 
     private  Expression parseFactorExpression(){
         Expression expression = parseUnary_expression();
-        if(tokens.match(STAR,SLASH)){
+        while(tokens.match(STAR,SLASH)){
             Token operator = tokens.consumeToken();
-            final Expression righthand = parseUnary_expression();
+            final Expression righthand = parseFactorExpression();
             FactorExpression factorExpression = new FactorExpression(operator,expression,righthand);
             factorExpression.setStart(expression.getStart());
             factorExpression.setEnd(righthand.getEnd());
             return factorExpression;
-        }else{
-            return expression;
         }
+        return expression;
+
     }
 
 
@@ -120,32 +120,32 @@ public class CatScriptParser {
 
     private Expression parseComparisonExpression(){
         Expression expression = parseAdditiveExpression();
-        if(tokens.match(GREATER_EQUAL,GREATER,LESS_EQUAL,LESS)){
+        while(tokens.match(GREATER_EQUAL,GREATER,LESS_EQUAL,LESS)){
             Token operator = tokens.consumeToken();
-            final Expression rightHand = parseAdditiveExpression();
+            final Expression rightHand = parseComparisonExpression();
             ComparisonExpression comparisonExpression = new ComparisonExpression(operator, expression, rightHand);
             comparisonExpression.setStart((expression.getStart()));
             comparisonExpression.setEnd(rightHand.getEnd());
             return comparisonExpression;
-        }else{
-            return expression;
         }
+        return expression;
+
     }
 
 
     private Expression parseEqualityExpression(){
         Expression expression= parseComparisonExpression();
-        if(tokens.match(BANG_EQUAL,EQUAL_EQUAL)){
+        while(tokens.match(BANG_EQUAL,EQUAL_EQUAL)){
             Token operator = tokens.consumeToken();
-            final Expression rightHandSide = parseComparisonExpression();
+            final Expression rightHandSide = parseEqualityExpression();
             EqualityExpression equalityExpression = new EqualityExpression(operator, expression,rightHandSide);
             equalityExpression.setStart(expression.getStart());
             equalityExpression.setEnd(rightHandSide.getEnd());
             return equalityExpression;
-        }else{
-            //parseComparisonExpression();
-            return expression;
         }
+            //parseComparisonExpression();
+        return expression;
+
 
     }
 
