@@ -178,38 +178,24 @@ public class CatScriptParser {
             return stringExpression;
         } else if(tokens.match(IDENTIFIER)) {
                 Token IdentifierToken = tokens.consumeToken();
-                IdentifierExpression IdentifierExpression = new IdentifierExpression(IdentifierToken.getStringValue());
-                IdentifierExpression.setToken(IdentifierToken);
-                return IdentifierExpression;
-
-
-
-        } else if(tokens.match(FUNCTION)) {
-            String name = "";
-            ArrayList<Expression> list = new ArrayList<>();
-            while(!tokens.match(EOF,LEFT_PAREN)){
-
-                name += tokens.consumeToken();
-
-            }
-
-            tokens.consumeToken();
-            while(!tokens.match(EOF,RIGHT_PAREN)){
-                if(tokens.match(COMMA)){
+                if(tokens.match(EOF)){
+                    IdentifierExpression IdentifierExpression = new IdentifierExpression(IdentifierToken.getStringValue());
+                    IdentifierExpression.setToken(IdentifierToken);
+                    return IdentifierExpression;
+                }else{
+                    ArrayList<Expression> list = new ArrayList<>();
                     tokens.consumeToken();
+                    while(!tokens.match(EOF,RIGHT_PAREN)){
+                        if(tokens.match(COMMA)){
+                            tokens.consumeToken();
+                        }
+                        list.add(parseExpression());
+                    }
+                    FunctionCallExpression functionExpression = new FunctionCallExpression(IdentifierToken.getStringValue(),list);
+                    require(RIGHT_PAREN,functionExpression, ErrorType.UNTERMINATED_ARG_LIST) ;
+                    return functionExpression;
+
                 }
-                list.add(parseExpression());
-            }
-            FunctionCallExpression functionExpression = new FunctionCallExpression(name,list);
-            require(RIGHT_PAREN,functionExpression, ErrorType.UNTERMINATED_ARG_LIST) ;
-            return functionExpression;
-
-
-
-
-
-
-
 
         } else if(tokens.match(TRUE, FALSE)) {
             Token BooleanToken = tokens.consumeToken();
