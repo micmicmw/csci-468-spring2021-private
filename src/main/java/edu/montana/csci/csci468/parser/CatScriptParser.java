@@ -153,9 +153,16 @@ public class CatScriptParser {
 
     private Expression parseAdditiveExpression() {
         Expression expression = parseFactorExpression();
+
         while(tokens.match(PLUS, MINUS)) {
+
             Token operator = tokens.consumeToken();
+
             final Expression rightHandSide = parseAdditiveExpression();
+            System.out.println(rightHandSide.toString());
+
+
+
             AdditiveExpression additiveExpression = new AdditiveExpression(operator, expression, rightHandSide);
             additiveExpression.setStart(expression.getStart());
             additiveExpression.setEnd(rightHandSide.getEnd());
