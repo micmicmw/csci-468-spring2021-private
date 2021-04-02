@@ -46,11 +46,11 @@ def student_dir(student)
 end
 
 def maven_test(pattern, output_file)
-  puts `mvn -B "-Dtest=#{pattern}" test > #{output_file} 2> err.out`
+  puts `timeout 30 mvn -B "-Dtest=#{pattern}" test > #{output_file} 2> err.out`
 end
 
 def cmake(output_file)
-  puts `cmake . > tmp.out; make > #{output_file} 2> err.out;`
+  puts `timeout 30 cmake . > tmp.out; make > #{output_file} 2> err.out;`
 end
 
 def maybe_exec(command, output_file)
@@ -101,6 +101,24 @@ when "grade"
       pull
       if grading_dir_exist?
         maven_test("CatScriptTokenizerTest", "grading/tokenizer_test.txt")
+        push_grading
+      end
+    end
+  elsif assignment == "expressions"
+    for_each_student_dir do |first, last, dir|
+      puts "Grading #{first} #{last} in #{dir}"
+      pull
+      if grading_dir_exist?
+        maven_test("CatscriptParserExpressionsTest", "grading/expressions_test.txt")
+        push_grading
+      end
+    end
+  elsif assignment == "eval"
+    for_each_student_dir do |first, last, dir|
+      puts "Grading #{first} #{last} in #{dir}"
+      pull
+      if grading_dir_exist?
+        maven_test("edu.montana.csci.csci468.tokenizer.*Test,edu.montana.csci.csci468.parser.*Test,edu.montana.csci.csci468.eval.*Test", "grading/eval_test.txt")
         push_grading
       end
     end

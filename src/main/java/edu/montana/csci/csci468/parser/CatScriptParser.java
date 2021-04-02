@@ -98,7 +98,7 @@ public class CatScriptParser {
                     = new LinkedList<Statement>();
             String body = "";
             while(!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)){
-                 body += tokens.consumeToken().getStringValue();
+                body += tokens.consumeToken().getStringValue();
 
 
 
@@ -134,7 +134,7 @@ public class CatScriptParser {
             unaryExpression.setEnd(righthand.getEnd());
             return unaryExpression;
         }
-            return parsePrimaryExpression();
+        return parsePrimaryExpression();
 
     }
 
@@ -182,7 +182,7 @@ public class CatScriptParser {
             equalityExpression.setEnd(rightHandSide.getEnd());
             return equalityExpression;
         }
-            //parseComparisonExpression();
+        //parseComparisonExpression();
         return expression;
 
 
@@ -223,25 +223,25 @@ public class CatScriptParser {
             stringExpression.setToken(stringToken);
             return stringExpression;
         } else if(tokens.match(IDENTIFIER)) {
-                Token IdentifierToken = tokens.consumeToken();
-                if(tokens.match(EOF)){
-                    IdentifierExpression IdentifierExpression = new IdentifierExpression(IdentifierToken.getStringValue());
-                    IdentifierExpression.setToken(IdentifierToken);
-                    return IdentifierExpression;
-                }else{
-                    ArrayList<Expression> list = new ArrayList<>();
-                    tokens.consumeToken();
-                    while(!tokens.match(EOF,RIGHT_PAREN)){
-                        if(tokens.match(COMMA)){
-                            tokens.consumeToken();
-                        }
-                        list.add(parseExpression());
+            Token IdentifierToken = tokens.consumeToken();
+            if(tokens.match(EOF)){
+                IdentifierExpression IdentifierExpression = new IdentifierExpression(IdentifierToken.getStringValue());
+                IdentifierExpression.setToken(IdentifierToken);
+                return IdentifierExpression;
+            }else{
+                ArrayList<Expression> list = new ArrayList<>();
+                tokens.consumeToken();
+                while(!tokens.match(EOF,RIGHT_PAREN)){
+                    if(tokens.match(COMMA)){
+                        tokens.consumeToken();
                     }
-                    FunctionCallExpression functionExpression = new FunctionCallExpression(IdentifierToken.getStringValue(),list);
-                    require(RIGHT_PAREN,functionExpression, ErrorType.UNTERMINATED_ARG_LIST) ;
-                    return functionExpression;
-
+                    list.add(parseExpression());
                 }
+                FunctionCallExpression functionExpression = new FunctionCallExpression(IdentifierToken.getStringValue(),list);
+                require(RIGHT_PAREN,functionExpression, ErrorType.UNTERMINATED_ARG_LIST) ;
+                return functionExpression;
+
+            }
 
         } else if(tokens.match(TRUE, FALSE)) {
             Token BooleanToken = tokens.consumeToken();
@@ -273,17 +273,17 @@ public class CatScriptParser {
 
         }else if(tokens.match(LEFT_PAREN)){
 
-        Token parenToken =tokens.consumeToken();
-        Expression expression= null;
+            Token parenToken =tokens.consumeToken();
+            Expression expression= null;
 
-        if(!tokens.match(RIGHT_PAREN)){
-            expression = parseExpression();
-        }
+            if(!tokens.match(RIGHT_PAREN)){
+                expression = parseExpression();
+            }
 
-        ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression(expression);
-        require(RIGHT_PAREN,parenthesizedExpression) ;
+            ParenthesizedExpression parenthesizedExpression = new ParenthesizedExpression(expression);
+            require(RIGHT_PAREN,parenthesizedExpression) ;
 
-        return parenthesizedExpression;
+            return parenthesizedExpression;
         }else{
             SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression();
             syntaxErrorExpression.setToken(tokens.consumeToken());
