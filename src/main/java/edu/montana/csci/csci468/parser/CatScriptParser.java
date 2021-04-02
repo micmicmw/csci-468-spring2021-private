@@ -7,7 +7,9 @@ import edu.montana.csci.csci468.tokenizer.Token;
 import edu.montana.csci.csci468.tokenizer.TokenList;
 import edu.montana.csci.csci468.tokenizer.TokenType;
 
+import javax.swing.plaf.nimbus.State;
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import static edu.montana.csci.csci468.tokenizer.TokenType.*;
 
@@ -51,10 +53,18 @@ public class CatScriptParser {
     //============================================================
 
     private Statement parseProgramStatement() {
+
         Statement printStmt = parsePrintStatement();
+        Statement forStmt = parseForStatement();
+
         if (printStmt != null) {
             return printStmt;
         }
+
+        if(forStmt != null){
+            return forStmt;
+        }
+
         return new SyntaxErrorStatement(tokens.consumeToken());
     }
 
@@ -70,6 +80,35 @@ public class CatScriptParser {
 
             return printStatement;
         } else {
+            return null;
+        }
+    }
+    private  Statement parseForStatement(){
+        if(tokens.match(FOR)){
+            ForStatement forStatement = new ForStatement();
+            forStatement.setStart(tokens.consumeToken());
+            require(LEFT_PAREN, forStatement);
+            forStatement.setVariableName(tokens.consumeToken().getStringValue());
+            require(IN, forStatement);
+            forStatement.setExpression((parseExpression()));
+            require(RIGHT_PAREN, forStatement);
+            require(LEFT_BRACE, forStatement);
+
+            LinkedList<Statement> statements
+                    = new LinkedList<Statement>();
+            String body = "";
+            while(!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)){
+                 body += tokens.consumeToken().getStringValue();
+
+
+
+            }
+            statements.add(parse(body));
+            forStatement.setBody(statements);
+            forStatement.setEnd(require(RIGHT_BRACE, forStatement));
+
+            return forStatement;
+        }else{
             return null;
         }
     }
