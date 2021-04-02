@@ -103,11 +103,11 @@ public class CatScriptParser {
         Expression expression = parseUnary_expression();
         while(tokens.match(STAR,SLASH)){
             Token operator = tokens.consumeToken();
-            final Expression righthand = parseFactorExpression();
+            final Expression righthand = parseUnary_expression();
             FactorExpression factorExpression = new FactorExpression(operator,expression,righthand);
             factorExpression.setStart(expression.getStart());
             factorExpression.setEnd(righthand.getEnd());
-            return factorExpression;
+            expression = factorExpression;
         }
         return expression;
 
@@ -158,7 +158,7 @@ public class CatScriptParser {
 
             Token operator = tokens.consumeToken();
 
-            final Expression rightHandSide = parseAdditiveExpression();
+            final Expression rightHandSide = parseFactorExpression();;
             System.out.println(rightHandSide.toString());
 
 
@@ -166,7 +166,7 @@ public class CatScriptParser {
             AdditiveExpression additiveExpression = new AdditiveExpression(operator, expression, rightHandSide);
             additiveExpression.setStart(expression.getStart());
             additiveExpression.setEnd(rightHandSide.getEnd());
-            return additiveExpression;
+            expression = additiveExpression;
         }
         return expression;
 
