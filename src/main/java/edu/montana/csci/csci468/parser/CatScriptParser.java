@@ -55,17 +55,58 @@ public class CatScriptParser {
     private Statement parseProgramStatement() {
 
         Statement printStmt = parsePrintStatement();
-        Statement forStmt = parseForStatement();
 
         if (printStmt != null) {
             return printStmt;
+        }else{
+            Statement forStmt = parseForStatement();
+            if(forStmt != null){
+                return forStmt;
+            }else{
+                Statement ifStmt =parseIfStatement();
+                if(ifStmt != null){
+                    return  ifStmt;
+                }
+            }
         }
-
-        if(forStmt != null){
-            return forStmt;
-        }
-
         return new SyntaxErrorStatement(tokens.consumeToken());
+    }
+    private Statement parseIfStatement(){
+        if(tokens.match(IF)){
+            IfStatement ifStatement = new IfStatement();
+            ifStatement.setStart(tokens.consumeToken());
+            require(LEFT_PAREN, ifStatement);
+            while(!tokens.match(RIGHT_PAREN) && !tokens.match(EOF)){
+                ifStatement.setExpression(parseExpression());
+            }
+            require(RIGHT_PAREN, ifStatement);
+            require(LEFT_BRACE, ifStatement);
+            LinkedList<Statement> truestatements
+                    = new LinkedList<Statement>();
+            while(!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)){
+                truestatements.add(parseProgramStatement());
+            }
+            ifStatement.setTrueStatements(truestatements);
+            //require(RIGHT_PAREN,functionExpression, ErrorType.UNTERMINATED_ARG_LIST) ;
+            if(tokens.match(EOF)){
+                ifStatement.setEnd(require(RIGHT_BRACE, ifStatement));
+                return ifStatement;
+            }else{
+                require(RIGHT_BRACE, ifStatement);
+                require(ELSE, ifStatement);
+                require(LEFT_BRACE, ifStatement);
+                LinkedList<Statement> elsestatements
+                        = new LinkedList<Statement>();
+                while(!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)){
+                    elsestatements.add(parseProgramStatement());
+                }
+                ifStatement.setElseStatements(elsestatements);
+                ifStatement.setEnd((require(RIGHT_BRACE,ifStatement)));
+                return ifStatement;
+            }
+        }else{
+            return null;
+        }
     }
 
     private Statement parsePrintStatement() {
@@ -96,14 +137,11 @@ public class CatScriptParser {
 
             LinkedList<Statement> statements
                     = new LinkedList<Statement>();
-            String body = "";
+
             while(!tokens.match(RIGHT_BRACE) && !tokens.match(EOF)){
-                body += tokens.consumeToken().getStringValue();
-
-
-
+                statements.add(parseProgramStatement());
             }
-            statements.add(parse(body));
+
             forStatement.setBody(statements);
             forStatement.setEnd(require(RIGHT_BRACE, forStatement));
 
@@ -224,11 +262,7 @@ public class CatScriptParser {
             return stringExpression;
         } else if(tokens.match(IDENTIFIER)) {
             Token IdentifierToken = tokens.consumeToken();
-            if(tokens.match(EOF)){
-                IdentifierExpression IdentifierExpression = new IdentifierExpression(IdentifierToken.getStringValue());
-                IdentifierExpression.setToken(IdentifierToken);
-                return IdentifierExpression;
-            }else{
+            if(tokens.match(LEFT_PAREN)){
                 ArrayList<Expression> list = new ArrayList<>();
                 tokens.consumeToken();
                 while(!tokens.match(EOF,RIGHT_PAREN)){
@@ -240,7 +274,11 @@ public class CatScriptParser {
                 FunctionCallExpression functionExpression = new FunctionCallExpression(IdentifierToken.getStringValue(),list);
                 require(RIGHT_PAREN,functionExpression, ErrorType.UNTERMINATED_ARG_LIST) ;
                 return functionExpression;
+            }else{
 
+                IdentifierExpression IdentifierExpression = new IdentifierExpression(IdentifierToken.getStringValue());
+                IdentifierExpression.setToken(IdentifierToken);
+                return IdentifierExpression;
             }
 
         } else if(tokens.match(TRUE, FALSE)) {
@@ -285,8 +323,8 @@ public class CatScriptParser {
 
             return parenthesizedExpression;
         }else{
-            SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression();
-            syntaxErrorExpression.setToken(tokens.consumeToken());
+            SyntaxErrorExpression syntaxErrorExpression = new SyntaxErrorExpression(tokens.consumeToken());
+            //syntaxErrorExpression.setToken(tokens.consumeToken());
             return syntaxErrorExpression;
         }
     }
