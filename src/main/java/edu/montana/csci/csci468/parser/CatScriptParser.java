@@ -66,10 +66,32 @@ public class CatScriptParser {
                 Statement ifStmt =parseIfStatement();
                 if(ifStmt != null){
                     return  ifStmt;
+                }else{
+                    Statement varSmt = parseVarStatement();
+                    if(varSmt != null){
+                        return  varSmt;
+                    }
                 }
             }
         }
         return new SyntaxErrorStatement(tokens.consumeToken());
+    }
+    private Statement parseVarStatement(){
+        if(tokens.match(VAR)){
+            VariableStatement variableStatement = new VariableStatement();
+            variableStatement.setStart(tokens.consumeToken());
+            variableStatement.setVariableName(tokens.consumeToken().getStringValue());
+            if(tokens.match(EQUAL)){
+                require(EQUAL,variableStatement);
+                variableStatement.setExpression(parseExpression());
+
+                return variableStatement;
+            }else{
+                require(COLON, variableStatement);
+                variableStatement.setExplicitType(tokens.consumeToken().toString());
+            }
+        }
+        return null;
     }
     private Statement parseIfStatement(){
         if(tokens.match(IF)){
