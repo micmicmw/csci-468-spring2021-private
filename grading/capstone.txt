@@ -1,0 +1,4 @@
+Errors:
+
+- Missing source zip
+- Missing Micheal_Wetherbee_portfolio.pdf
