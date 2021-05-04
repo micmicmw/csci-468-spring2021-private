@@ -1,6 +1,8 @@
 package edu.montana.csci.csci468.tokenizer;
 
 import edu.montana.csci.csci468.CatscriptTestBase;
+import edu.montana.csci.csci468.parser.expressions.ListLiteralExpression;
+import edu.montana.csci.csci468.parser.statements.ForStatement;
 import edu.montana.csci.csci468.parser.statements.FunctionCallStatement;
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +12,7 @@ import static edu.montana.csci.csci468.tokenizer.TokenType.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class capstonetests extends CatscriptTestBase {
-
+/*
     @Test
     public void simpleTokenizerTest(){
         assertTokensAre("6 + 7", INTEGER, PLUS, INTEGER, EOF);
@@ -53,5 +55,55 @@ public class capstonetests extends CatscriptTestBase {
         assertEquals(4, expr.getArguments().size());
     }
 
+
+
+
+
+*/
+
+
+
+
+    @Test
+    void additiveParenthesisCheck()
+    {
+        assertEquals(7, evaluateExpression("(1 + 1)+(2+3)"));
+        assertEquals(-4, evaluateExpression("(2 + 1)-(2+5)"));
+        assertEquals(127, evaluateExpression("(56 + 41)+(25+5)"));
+    }
+
+    @Test
+    void factorMultipleParenthesisCheck()
+    {
+        assertEquals(120, evaluateExpression("(2*2)*(5*3)*(1*2)"));
+        assertEquals(0, evaluateExpression("(254*212)*(533*233)*(1*0)"));
+        assertEquals((10*15*10), evaluateExpression("(5*2)*(5*3)*(5*2)"));
+    }
+    //Test for end of parenthesis
+    @Test
+    void multipleParenthesisCheck()
+    {
+        assertEquals(5, evaluateExpression("(((5)))"));
+        assertEquals(13, evaluateExpression("((((10+3))))"));
+        assertEquals(64, evaluateExpression("((5)+3)*((8))"));
+    }
+
+    @Test
+    public void TokenizeVarStatement(){
+        assertTokensAre("var z = 25", VAR, IDENTIFIER, EQUAL, INTEGER, EOF);
+        assertTokensAre("var y <= 2", VAR,IDENTIFIER,LESS_EQUAL,INTEGER,EOF);
+        assertTokensAre("var x != y", VAR, IDENTIFIER, BANG_EQUAL, IDENTIFIER, EOF);
+    }
+
+
+    @Test
+    void forLoopParseCheck()
+    {
+        ForStatement forExpression = parseStatement("for(a in [123, 321, 555]){ print(a) }");
+        assertNotNull(forExpression);
+        assertEquals("a", forExpression.getVariableName());
+        assertTrue(forExpression.getExpression() instanceof ListLiteralExpression);
+        assertEquals(1, forExpression.getBody().size());
+    }
 
 }
